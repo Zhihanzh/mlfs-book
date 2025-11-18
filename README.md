@@ -68,7 +68,7 @@ The hindcast plots show predicted vs actual PM2.5 values over time, with the log
 
 **With Lag Features**
 
-![Hindcast with Lag Features](docs/air-quality/assets/img/hindcast_with_lag.png)
+![Hindcast with Lag Features](figure/Prediction%20with%20lag%20feature.png)
 
 Model captures temporal patterns more accurately, with predictions (purple line) closely following actual values (black line).
 
@@ -77,7 +77,7 @@ Model captures temporal patterns more accurately, with predictions (purple line)
 
 **Without Lag Features**
 
-![Hindcast without Lag Features](docs/air-quality/assets/img/hindcast_without_lag.png)
+![Hindcast without Lag Features](figure/Prediction%20without%20lag%20feature.png)
 
 Baseline model without temporal features shows larger prediction errors and fails to capture day-to-day variations.
 
@@ -95,7 +95,7 @@ Feature importance scores reveal how lag features dominate prediction performanc
 
 **With Lag Features**
 
-![Feature Importance with Lag](docs/air-quality/assets/img/feature_importance_with_lag.png)
+![Feature Importance with Lag](figure/Feature%20importance%20with%20lag%20feature.png)
 
 - **pm25_lag1**: 1007 (most important)
 - **pm25_lag2**: 791
@@ -109,7 +109,7 @@ Lag features account for ~60% of total importance.
 
 **Without Lag Features**
 
-![Feature Importance without Lag](docs/air-quality/assets/img/feature_importance_without_lag.png)
+![Feature Importance without Lag](figure/Feature%20importance%20without%20lag%20feature.png)
 
 - **temperature_2m_mean**: 1590 (most important)
 - **wind_speed_10m_max**: 1379
@@ -127,9 +127,3 @@ Weather features become primary predictors, but overall performance is significa
 2. **Temporal patterns dominate**: Past PM2.5 values are stronger predictors than weather conditions
 3. **Combined approach works best**: Lag features + weather data provide optimal accuracy
 4. **Practical impact**: 67% MSE reduction translates to more reliable air quality forecasts
-
-### Current Forecast
-
-![7-Day PM2.5 Forecast](docs/air-quality/assets/img/pm25_forecast.png)
-
-The system generates daily 7-day forecasts with color-coded air quality categories, automatically updated via GitHub Actions.
