@@ -291,10 +291,44 @@ def backfill_predictions_for_monitoring(weather_fg, air_quality_df, monitor_fg, 
     features_df = weather_fg.read()
     features_df = features_df.sort_values(by=['date'], ascending=True)
     features_df = features_df.tail(10)
-    features_df['predicted_pm25'] = model.predict(features_df[['temperature_2m_mean', 'precipitation_sum', 'wind_speed_10m_max', 'wind_direction_10m_dominant']])
+
+    air_quality_sorted = air_quality_df.sort_values(by=['date'], ascending=True)
+
+    lag_features = []
+    for idx, row in features_df.iterrows():
+        date = row['date']
+        historical = air_quality_sorted[air_quality_sorted['date'] < date].tail(3)
+
+        if len(historical) >= 3:
+            lag_features.append({
+                'date': date,
+                'pm25_lag1': historical.iloc[-1]['pm25'],
+                'pm25_lag2': historical.iloc[-2]['pm25'],
+                'pm25_lag3': historical.iloc[-3]['pm25']
+            })
+        else:
+            lag_features.append({
+                'date': date,
+                'pm25_lag1': 0.0,
+                'pm25_lag2': 0.0,
+                'pm25_lag3': 0.0
+            })
+
+    lag_df = pd.DataFrame(lag_features)
+    features_df = pd.merge(features_df, lag_df, on='date')
+
+    features_df['predicted_pm25'] = model.predict(features_df[['pm25_lag1', 'pm25_lag2', 'pm25_lag3', 'temperature_2m_mean', 'precipitation_sum', 'wind_speed_10m_max', 'wind_direction_10m_dominant']])
     df = pd.merge(features_df, air_quality_df[['date','pm25','street','country']], on="date")
     df['days_before_forecast_day'] = 1
     hindcast_df = df
     df = df.drop('pm25', axis=1)
+    RENAME_FOR_MONITOR = {
+        "temperature_2m_mean": "weather_temperature_2m_mean",
+        "precipitation_sum": "weather_precipitation_sum",
+        "wind_speed_10m_max": "weather_wind_speed_10m_max",
+        "wind_direction_10m_dominant": "weather_wind_direction_10m_dominant",
+    }
+    df = df.rename(columns=RENAME_FOR_MONITOR)
+    
     monitor_fg.insert(df, write_options={"wait_for_job": True})
     return hindcast_df
